@@ -136,3 +136,32 @@ The median value using this imputed data is 371 greater than the median of the o
 
 Imputing missing data has the impact of increasing the total daily number of steps.
 
+## Are there differences in activity patterns between weekdays and weekends?
+
+
+```r
+    # Create a factor variable with two levels indicating if date is a weekday or weekend
+    complete$weekend <- as.factor(ifelse(weekdays(as.character(complete$date,format = "%d/%m/%Y"))
+                                        %in% c("Sat","Sun"), "weekend", "weekday"))
+```
+
+```
+## Warning in convert.dates(dates., format = fmt, origin. = origin.): 10656
+## months out of range set to NA
+```
+
+```r
+    # Calculate the average number of steps taken each interval (averaged across all days)
+    avg<-aggregate(complete$steps,by=list(interval=complete$interval,weekend=complete$weekend),FUN=mean,na.rm=TRUE)
+    # Give the average steps column of this aggregated data a sensible name
+    names(avg)[3]<-"Number_of_steps"
+
+    # Plot this averaged activity data split by weekday/weekend
+    library(ggplot2)
+    plot<-ggplot(avg, aes(x=interval, y=Number_of_steps)) + geom_line(color="blue") + facet_grid(weekend ~ .)
+    plot
+```
+
+![plot of chunk weekday](figure/weekday-1.png) 
+
+The above panel plot shows the average number of steps taken, averaged across all weekday days or weekend days.
